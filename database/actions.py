@@ -17,7 +17,7 @@ def _retrieve_all_data(db: db, model: T, *colums: ModelBase) -> ModelSelect:
     return response
 
 
-class ActInterface():
+class ActInterface:
     @staticmethod
     def create():
         return _store_date
