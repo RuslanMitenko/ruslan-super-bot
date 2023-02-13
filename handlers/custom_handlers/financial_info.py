@@ -96,14 +96,14 @@ def get_purpose(message: Message):
                               reverse=data['reverse'])
 
         if data['period'] == 'QUARTERLY':
-            text = 'Информация в формате год / квартал / показатель.\n'
+            text = ''
             for elem in sorted_tuple:
-                text = text + f"{elem['year']}    {elem['quarter']}    {elem[data['purpose']]}\n"
+                text = text + f"{elem['year']} год {elem['quarter']} квартал:    {elem[data['purpose']]}\n"
 
         elif data['period'] == 'ANNUAL':
-            text = 'Информация в формате год / показатель.\n'
+            text = ''
             for elem in sorted_tuple:
-                text = text + f"{elem['year']}    {elem[data['purpose']]}\n"
+                text = text + f"{elem['year']} год:    {elem[data['purpose']]}\n"
 
         bot.send_message(message.from_user.id, text)
 

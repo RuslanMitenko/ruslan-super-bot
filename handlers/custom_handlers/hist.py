@@ -24,4 +24,4 @@ def bot_hist(message: Message):
         for hist in query:
             text = text + f'\n{hist.create_at}     {hist.message}'
 
-    bot.send_message(message.from_user.id, 'Последние 10 запросов: ' + text)
+    bot.send_message(message.from_user.id, 'Последние 10 запросов:' + text)
