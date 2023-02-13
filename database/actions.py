@@ -6,8 +6,8 @@ T = TypeVar('T')
 
 
 def _store_date(db: db, model: T, *data: List[Dict]) -> None:
-    with db.atomic():
-        model.insert_many(*data).execute()
+    # with db.atomic():
+    model.insert_many(*data).execute()
 
 
 def _retrieve_all_data(db: db, model: T, *colums: ModelBase) -> ModelSelect:
