@@ -51,12 +51,15 @@ def get_company(message: Message):
                                                    f'Изменение к прошлому дню (отн.): {change_percent} %\n'
                                                    f'Предыдущая цена: {previous_close} {currency}\n')
 
-            data = [{"message": f'Инфо по бумагам {name}'}]
+            data = [{"message": f'Инфо по бумагам {name}', "user": message.from_user.id}]
             db_write(db, History, data)
+
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            data['name'] = message.text
+
+        bot.delete_state(message.from_user.id, message.chat.id)
 
     else:
         bot.send_message(message.from_user.id, 'К сожалению, не удалось найти информацию.'
                                                ' Попробуйте сформулировать точнее')
 
-    with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        data['name'] = message.text

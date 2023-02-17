@@ -48,7 +48,7 @@ def get_param(message: Message):
         data['purpose'] = purpose
         data['purpose text'] = message.text
 
-    bot.send_message(message.from_user.id, 'Введите компанию для вывода финансовой информации',
+    bot.send_message(message.from_user.id, 'Установите параметры:',
                      reply_markup=sort_params())
     bot.set_state(message.from_user.id, FinInfoState.param, message.chat.id)
 
@@ -98,7 +98,7 @@ def get_purpose(message: Message):
         if data['period'] == 'QUARTERLY':
             text = ''
             for elem in sorted_tuple:
-                text = text + f"{elem['year']} год {elem['quarter']} квартал:    {elem[data['purpose']]}\n"
+                text = text + f"{elem['year']} год    {elem['quarter']} квартал:    {elem[data['purpose']]}\n"
 
         elif data['period'] == 'ANNUAL':
             text = ''
@@ -107,9 +107,12 @@ def get_purpose(message: Message):
 
         bot.send_message(message.from_user.id, text)
 
-        data = [{"message": f"Запрос показателя {data['purpose text']} по компании {data['period']}"}]
+        data = [{"message": f"Запрос показателя {data['purpose text']} по компании {data['period']}",
+                 "user": message.from_user.id}]
         db_write(db, History, data)
 
     else:
         bot.send_message(message.from_user.id, 'К сожалению, не удалось найти информацию.'
                                                ' Попробуйте ещё раз.')
+
+    bot.delete_state(message.from_user.id, message.chat.id)
