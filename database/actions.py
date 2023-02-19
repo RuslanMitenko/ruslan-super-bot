@@ -1,6 +1,6 @@
 from typing import Dict, List, TypeVar
 from .models import db, ModelBase
-from peewee import ModelBase, ModelSelect
+from peewee import ModelSelect
 
 T = TypeVar('T')
 
@@ -10,9 +10,10 @@ def _store_date(db: db, model: T, *data: List[Dict]) -> None:
         model.insert_many(*data).execute()
 
 
-def _retrieve_all_data(db: db, model: T, *colums: ModelBase) -> ModelSelect:
+def _retrieve_all_data(db: db, model: T, user_id: int, *colums: ModelBase) -> ModelSelect:
     with db.atomic():
-        response = model.select(*colums)
+        response = model.select(*colums).where(model.user == user_id).\
+            order_by(model.id.desc()).limit(10)
 
     return response
 

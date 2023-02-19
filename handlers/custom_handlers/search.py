@@ -1,12 +1,9 @@
 from telebot.types import Message
-import requests
-
 from database.core import action
 from database.models import db, History
 from loader import bot
-from config_data.config import RAPID_API_KEY
 from states.company import CompanyInfoState
-import json
+from api.search_ticker import search_ticker
 
 db_write = action.create()
 
@@ -20,15 +17,7 @@ def bot_search(message: Message):
 @bot.message_handler(state=CompanyInfoState.name)
 def get_company(message: Message):
 
-    url = "https://real-time-finance-data.p.rapidapi.com/search"
-    querystring = {"query": message.text}
-    headers = {
-        "X-RapidAPI-Key": RAPID_API_KEY,
-        "X-RapidAPI-Host": 'real-time-finance-data.p.rapidapi.com'
-    }
-
-    response = requests.request("GET", url, headers=headers, params=querystring, timeout=3)
-    js = json.loads(response.text)
+    js = search_ticker(query=message.text)
 
     ticker_length = len(js['data']['stock'])
     if ticker_length > 0:
@@ -62,4 +51,3 @@ def get_company(message: Message):
     else:
         bot.send_message(message.from_user.id, 'К сожалению, не удалось найти информацию.'
                                                ' Попробуйте сформулировать точнее')
-

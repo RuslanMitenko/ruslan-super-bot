@@ -1,20 +1,18 @@
 from database.core import action
 from database.models import db, History
 from loader import bot
-from config_data.config import RAPID_API_KEY
 from states.fin_info import FinInfoState
-import requests
-import json
 from telebot.types import Message
 from keyboards.reply.fin_info_params import fin_info_params
 from keyboards.reply.sort_params import sort_params
+from api.fin_info import fin_info
 
 db_write = action.create()
 
 
 @bot.message_handler(commands=['financial_info'])
 def bot_search(message: Message):
-    bot.send_message(message.from_user.id, 'Введите компанию для вывода финансовой информации.')
+    bot.send_message(message.from_user.id, 'Введите компанию или тикер для вывода финансовой информации по компании.')
     bot.set_state(message.from_user.id, FinInfoState.name, message.chat.id)
 
 
@@ -56,7 +54,6 @@ def get_param(message: Message):
 @bot.message_handler(content_types=['text'], state=FinInfoState.param)
 def get_purpose(message: Message):
 
-    global text
     if message.text == 'По возрастанию, ежеквартально':
         period = 'QUARTERLY'
         reverse = False
@@ -74,22 +71,7 @@ def get_purpose(message: Message):
         data['period'] = period
         data['reverse'] = reverse
 
-    url = "https://real-time-finance-data.p.rapidapi.com/company-income-statement"
-
-    # period = ['ANNUAL', 'QUARTERLY']
-    querystring = {"symbol": data['name'], "period": period}
-
-    headers = {
-        "X-RapidAPI-Key": RAPID_API_KEY,
-        "X-RapidAPI-Host": "real-time-finance-data.p.rapidapi.com"
-    }
-
-    response = requests.request("GET", url, headers=headers, params=querystring, timeout=3)
-    print(response.text)
-    js = json.loads(response.text)
-
-    # purp = data['purpose']
-    # per = data['period']
+    js = fin_info(symbol=data['name'], period=period)
 
     if len(js['data']) > 0:
         sorted_tuple = sorted(js['data']['income_statement'], key=lambda elem: elem[data['purpose']],
